@@ -6,10 +6,11 @@ public class CharacterController : MonoBehaviour
 {
    public bool isWalking;
    public bool isRunning;
-    bool pickingUp;
+   bool pickingUp;
 
     [SerializeField] float walkSpeed;
     [SerializeField] float runSpeed;
+    [SerializeField] float turnSpeed;
 
     Animator kidController; 
 
@@ -26,25 +27,14 @@ public class CharacterController : MonoBehaviour
         //basic movement
         if (Input.GetKey(KeyCode.A))
         {
-            transform.position += -transform.right * Time.deltaTime * walkSpeed;
-            isWalking = true; 
-
-            if (isRunning)
-            {
-                transform.position += -transform.right * Time.deltaTime * runSpeed;
-            }
+            transform.localEulerAngles += new Vector3(0,-1,0) * Time.deltaTime * turnSpeed; 
         }
-        else if (Input.GetKey(KeyCode.S))
+        else if (Input.GetKey(KeyCode.D))
         {
-            transform.position += -transform.forward * Time.deltaTime * walkSpeed;
-            isWalking = true;
-
-            if (isRunning)
-            {
-                transform.position += -transform.forward * Time.deltaTime * runSpeed;
-            }
+            transform.localEulerAngles += new Vector3(0, 1, 0) * Time.deltaTime * turnSpeed;
         }
-        else if (Input.GetKey(KeyCode.W))
+      
+        if (Input.GetKey(KeyCode.W))
         {
             transform.position += transform.forward * Time.deltaTime * walkSpeed;
             isWalking = true;
@@ -52,17 +42,6 @@ public class CharacterController : MonoBehaviour
             if (isRunning)
             {
                 transform.position += transform.forward * Time.deltaTime * runSpeed;
-            }
-        }
-        else if (Input.GetKey(KeyCode.D))
-        {
-            transform.position += transform.right * Time.deltaTime * walkSpeed;
-            isWalking = true;
-           
-
-            if (isRunning)
-            {
-                transform.position += transform.right * Time.deltaTime * runSpeed;
             }
         }
         else
@@ -80,13 +59,12 @@ public class CharacterController : MonoBehaviour
         {
             isRunning = false; 
         }
-        /*
+        
         //pickup (debug)
         if (Input.GetKey(KeyCode.Space))
         {
             pickingUp = true; 
         }
-        */
 
         //set animation bools 
         if (isWalking)
