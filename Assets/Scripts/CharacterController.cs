@@ -59,13 +59,13 @@ public class CharacterController : MonoBehaviour
         {
             isRunning = false; 
         }
-        
+        /*
         //pickup (debug)
         if (Input.GetKey(KeyCode.Space))
         {
             pickingUp = true; 
         }
-
+        */
         //set animation bools 
         if (isWalking)
         {
