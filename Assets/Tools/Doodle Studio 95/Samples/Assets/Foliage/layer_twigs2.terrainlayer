@@ -7,7 +7,7 @@ TerrainLayer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: layer_twigs2
-  m_DiffuseTexture: {fileID: 2800000, guid: 4821005f95a2d48c7b4e08d09ddf15e9, type: 3}
+  m_DiffuseTexture: {fileID: 2800000, guid: 131ff93a90a45434e9a95a181f0c9996, type: 3}
   m_NormalMapTexture: {fileID: 0}
   m_MaskMapTexture: {fileID: 0}
   m_TileSize: {x: 5, y: 5}
