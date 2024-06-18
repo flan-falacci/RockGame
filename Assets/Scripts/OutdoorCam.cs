@@ -15,9 +15,11 @@ public class OutdoorCam : MonoBehaviour
 
     Vector3 northPos;
     Vector3 northEuler;
+    Quaternion northQuat;
 
     Vector3 westPos;
     Vector3 westEuler;
+    Quaternion westQuat; 
 
     //CAMERA
     Camera myCam;
@@ -48,11 +50,19 @@ public class OutdoorCam : MonoBehaviour
         basePos = Camera.main.gameObject.transform.position;
         baseEuler = Camera.main.gameObject.transform.eulerAngles;
         baseQuat = Quaternion.Euler(baseEuler);
-
-        eastPos = new Vector3(basePos.x + 8.36f, basePos.y, basePos.z + 6.5f);
+        //EAST
+        eastPos = new Vector3(basePos.x + 7.36f, basePos.y, basePos.z + 6.5f);
         eastEuler = new Vector3(baseEuler.x, baseEuler.y - 90, baseEuler.z);
         eastQuat = Quaternion.Euler(eastEuler);
-
+        //NORTH
+        northPos = new Vector3(basePos.x, basePos.y, basePos.z + 14.3f);
+        northEuler = new Vector3(baseEuler.x, baseEuler.y +180, baseEuler.z);
+        northQuat = Quaternion.Euler(northEuler);
+        //WEST
+        westPos = new Vector3(basePos.x - 7.3f, basePos.y, basePos.z + 6.5f);
+        westEuler = new Vector3(baseEuler.x, baseEuler.y + 90, baseEuler.z);
+        westQuat = Quaternion.Euler(westEuler);
+        
         //set bools 
         atBase = true;
         atEast = false;
@@ -70,12 +80,6 @@ public class OutdoorCam : MonoBehaviour
     //z position STARTS at -7
     //x potisin STARTS at 0
 
-    //RIGHT MOVE
-    //-90 Y rotation
-
-    //xposition is now 8.36 (about half the square length) 
-    //z position is now -0.177 (minor adjustment?)
-
     void Update()
     {
         if (LerpingLeft || LerpingRight)
@@ -84,7 +88,6 @@ public class OutdoorCam : MonoBehaviour
         }
         else
         {
-
             if (Input.GetKeyDown(KeyCode.RightArrow))
             {
                 LerpingRight = true;
@@ -104,13 +107,121 @@ public class OutdoorCam : MonoBehaviour
             myCamTrans.position = Vector3.Lerp(myCamTrans.position, eastPos, timer);
             myCamTrans.rotation = Quaternion.Slerp(Quaternion.Euler(myCamTrans.eulerAngles), eastQuat, timer);
 
-            if (myCamTrans.rotation == eastQuat)
+            if (myCamTrans.position == eastPos)
             {
                 Debug.Log("finished lerp");
                 timer = 0;
                 atBase = false;
                 atEast = true;
                 LerpingRight = false;
+            }
+        }
+        //rotating left from base
+        if (atBase && LerpingLeft)
+        { 
+            timer += Time.deltaTime * lerpSpeed;
+            myCamTrans.position = Vector3.Lerp(myCamTrans.position, westPos, timer);
+            myCamTrans.rotation = Quaternion.Slerp(Quaternion.Euler(myCamTrans.eulerAngles), westQuat, timer);
+
+            if (myCamTrans.position == westPos)
+            {
+                Debug.Log("finished lerp");
+                timer = 0;
+                atBase = false;
+                atWest = true;
+                LerpingLeft = false;
+            }
+        }
+        if (atEast && LerpingRight)
+        {
+            timer += Time.deltaTime * lerpSpeed;
+            myCamTrans.position = Vector3.Lerp(myCamTrans.position, northPos, timer);
+            myCamTrans.rotation = Quaternion.Slerp(Quaternion.Euler(myCamTrans.eulerAngles), northQuat, timer);
+
+            if (myCamTrans.position == northPos)
+            {
+                timer = 0;
+                atEast = false;
+                atNorth = true;
+                LerpingRight = false;
+            }
+        }
+        else if (atEast && LerpingLeft)
+        {
+            timer += Time.deltaTime * lerpSpeed;
+            myCamTrans.position = Vector3.Lerp(myCamTrans.position, basePos, timer);
+            myCamTrans.rotation = Quaternion.Slerp(Quaternion.Euler(myCamTrans.eulerAngles), baseQuat, timer);
+
+            if (myCamTrans.position == basePos)
+            {
+                Debug.Log("finished lerp");
+                timer = 0;
+                atEast = false;
+                atBase = true;
+                LerpingLeft = false;
+            }
+        }
+        if (atNorth && LerpingRight)
+        {
+            //North to West
+            timer += Time.deltaTime * lerpSpeed;
+            myCamTrans.position = Vector3.Lerp(myCamTrans.position, westPos, timer);
+            myCamTrans.rotation = Quaternion.Slerp(Quaternion.Euler(myCamTrans.eulerAngles), westQuat, timer);
+
+            if (myCamTrans.position == westPos)
+            {
+                Debug.Log("finished lerp");
+                timer = 0;
+                atNorth = false;
+                atWest = true;
+                LerpingRight = false;
+            }
+        }
+        else if (atNorth && LerpingLeft)
+        {
+            timer += Time.deltaTime * lerpSpeed;
+            myCamTrans.position = Vector3.Lerp(myCamTrans.position, eastPos, timer);
+            myCamTrans.rotation = Quaternion.Slerp(Quaternion.Euler(myCamTrans.eulerAngles), eastQuat, timer);
+
+            if (myCamTrans.position == eastPos)
+            {
+                Debug.Log("finished lerp");
+                timer = 0;
+                atNorth = false;
+                atEast = true;
+                LerpingLeft = false;
+            }
+        }
+        if (atWest && LerpingRight)
+        {
+            //west to Base
+            timer += Time.deltaTime * lerpSpeed;
+            myCamTrans.position = Vector3.Lerp(myCamTrans.position, basePos, timer);
+            myCamTrans.rotation = Quaternion.Slerp(Quaternion.Euler(myCamTrans.eulerAngles), baseQuat, timer);
+
+            if (myCamTrans.position == basePos)
+            {
+                Debug.Log("finished lerp");
+                timer = 0;
+                atWest = false;
+                atBase = true;
+                LerpingRight = false;
+            }
+        }
+        else if (atWest && LerpingLeft)
+        {
+            //west to north 
+            timer += Time.deltaTime * lerpSpeed;
+            myCamTrans.position = Vector3.Lerp(myCamTrans.position, northPos, timer);
+            myCamTrans.rotation = Quaternion.Slerp(Quaternion.Euler(myCamTrans.eulerAngles), northQuat, timer);
+
+            if (myCamTrans.position == northPos)
+            {
+                Debug.Log("finished lerp");
+                timer = 0;
+                atWest = false;
+                atNorth = true;
+                LerpingLeft = false;
             }
         }
     }
