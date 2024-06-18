@@ -19,7 +19,19 @@ public class OutdoorCam : MonoBehaviour
 
     Vector3 westPos;
     Vector3 westEuler;
-    Quaternion westQuat; 
+    Quaternion westQuat;
+
+    Vector3 moveNorth;
+    Vector3 moveSouth;
+    Vector3 moveWest;
+    Vector3 moveEast;
+
+    Vector3 moveBordersNorth;
+    Vector3 moveBordersSouth;
+    Vector3 moveBordersEast;
+    Vector3 moveBordersWest; 
+
+    bool addedMoveAmount; 
 
     //CAMERA
     Camera myCam;
@@ -29,6 +41,11 @@ public class OutdoorCam : MonoBehaviour
     float t;
     public float lerpSpeed;
     float timer;
+    float timer2;
+
+    public GameObject bordersParent;
+    Transform bordersTrans;
+    Vector3 bordersBasePos; 
 
     //BOOLS
     bool LerpingRight;
@@ -45,6 +62,9 @@ public class OutdoorCam : MonoBehaviour
        //SET CAMERA TO MAIN
         myCam = Camera.main;
         myCamTrans = myCam.gameObject.transform;
+        //border parent transform
+        bordersTrans = bordersParent.transform;
+        bordersBasePos = bordersTrans.position; 
 
         //SET POS + ROTS FOR EACH ORIENTATION 
         basePos = Camera.main.gameObject.transform.position;
@@ -69,7 +89,9 @@ public class OutdoorCam : MonoBehaviour
         atNorth = false;
         atWest = false;
 
-        timer = 0; 
+        timer = 0;
+        timer2 = 0;
+
     }
     //CONSTANT
     //x rotation is always 36.3
@@ -82,6 +104,177 @@ public class OutdoorCam : MonoBehaviour
 
     void Update()
     {
+        //MOVING THE BASE POSITION BASED ON BORDER TRIGGERS
+        //MOVE NORTH
+        if (borderTrigger.goingNorth)
+        {
+            timer2 += Time.deltaTime * lerpSpeed;
+            if (!addedMoveAmount)
+            {
+                moveNorth = new Vector3(myCamTrans.position.x, myCamTrans.position.y, myCamTrans.position.z + 10);
+                moveBordersNorth = new Vector3(bordersTrans.position.x, bordersTrans.position.y, bordersTrans.position.z + 10);
+                addedMoveAmount = true; 
+
+            }else if (addedMoveAmount)
+            {
+               //do nothing if we already added 10 
+            }
+            //lerp to the new postition
+            myCamTrans.position = Vector3.Lerp(myCamTrans.position, moveNorth, timer2);
+            //set base pos to the new base position 
+            if (myCamTrans.position == moveNorth)
+            {
+                Vector3 newBasePos = new Vector3(basePos.x, basePos.y, basePos.z + 10);
+                basePos = newBasePos;
+                //RESET BASED ON NEW BASE POS
+                //EAST
+                eastPos = new Vector3(basePos.x + 7.36f, basePos.y, basePos.z + 6.5f);
+                eastEuler = new Vector3(baseEuler.x, baseEuler.y - 90, baseEuler.z);
+                eastQuat = Quaternion.Euler(eastEuler);
+                //NORTH
+                northPos = new Vector3(basePos.x, basePos.y, basePos.z + 14.3f);
+                northEuler = new Vector3(baseEuler.x, baseEuler.y + 180, baseEuler.z);
+                northQuat = Quaternion.Euler(northEuler);
+                //WEST
+                westPos = new Vector3(basePos.x - 7.3f, basePos.y, basePos.z + 6.5f);
+                westEuler = new Vector3(baseEuler.x, baseEuler.y + 90, baseEuler.z);
+                westQuat = Quaternion.Euler(westEuler);
+                //move borders over 
+                bordersTrans.position = moveBordersNorth;
+                //reset    
+                borderTrigger.goingNorth = false;
+                timer2 = 0;
+                addedMoveAmount = false;
+   
+            }
+        }
+        //MOVE SOUTH 
+        if (borderTrigger.goingSouth)
+        {
+            timer2 += Time.deltaTime * lerpSpeed;
+            if (!addedMoveAmount)
+            {
+                moveSouth = new Vector3(myCamTrans.position.x, myCamTrans.position.y, myCamTrans.position.z - 10);
+                moveBordersSouth = new Vector3(bordersTrans.position.x, bordersTrans.position.y, bordersTrans.position.z - 10);
+                addedMoveAmount = true;
+            }
+            else if (addedMoveAmount)
+            {
+                //do nothing if we already moved 
+            }
+            //lerp to the new postition
+            myCamTrans.position = Vector3.Lerp(myCamTrans.position, moveSouth, timer2);
+            //set base pos to the new base position
+            if (myCamTrans.position == moveSouth)
+            {
+                Vector3 newBasePos = new Vector3(basePos.x, basePos.y, basePos.z - 10);
+                basePos = newBasePos;
+                //RESET DIRECTIONS BASED ON NEW BASE POS
+                //EAST
+                eastPos = new Vector3(basePos.x + 7.36f, basePos.y, basePos.z + 6.5f);
+                eastEuler = new Vector3(baseEuler.x, baseEuler.y - 90, baseEuler.z);
+                eastQuat = Quaternion.Euler(eastEuler);
+                //NORTH
+                northPos = new Vector3(basePos.x, basePos.y, basePos.z + 14.3f);
+                northEuler = new Vector3(baseEuler.x, baseEuler.y + 180, baseEuler.z);
+                northQuat = Quaternion.Euler(northEuler);
+                //WEST
+                westPos = new Vector3(basePos.x - 7.3f, basePos.y, basePos.z + 6.5f);
+                westEuler = new Vector3(baseEuler.x, baseEuler.y + 90, baseEuler.z);
+                westQuat = Quaternion.Euler(westEuler);
+                //move borders
+                bordersTrans.position = moveBordersSouth;
+                //reset
+                borderTrigger.goingSouth = false;
+                timer2 = 0;
+                addedMoveAmount = false;
+            }
+        }
+        //MOVE EAST
+        if (borderTrigger.goingEast)
+        {
+            timer2 += Time.deltaTime * lerpSpeed;
+            if (!addedMoveAmount)
+            {
+                moveEast = new Vector3(myCamTrans.position.x +10, myCamTrans.position.y, myCamTrans.position.z);
+                moveBordersEast = new Vector3(bordersTrans.position.x +10, bordersTrans.position.y, bordersTrans.position.z);
+                addedMoveAmount = true;
+            }
+            else if (addedMoveAmount)
+            {
+                //do nothing if we already moved 
+            }
+            //lerp to the new postition
+            myCamTrans.position = Vector3.Lerp(myCamTrans.position, moveEast, timer2);
+            //set base pos to the new base position 
+            if (myCamTrans.position == moveEast)
+            {
+                Vector3 newBasePos = new Vector3(basePos.x + 10 , basePos.y, basePos.z);
+                basePos = newBasePos;
+                //RESET DIRECTIONS BASED ON NEW BASE POS
+                //EAST
+                eastPos = new Vector3(basePos.x + 7.36f, basePos.y, basePos.z + 6.5f);
+                eastEuler = new Vector3(baseEuler.x, baseEuler.y - 90, baseEuler.z);
+                eastQuat = Quaternion.Euler(eastEuler);
+                //NORTH
+                northPos = new Vector3(basePos.x, basePos.y, basePos.z + 14.3f);
+                northEuler = new Vector3(baseEuler.x, baseEuler.y + 180, baseEuler.z);
+                northQuat = Quaternion.Euler(northEuler);
+                //WEST
+                westPos = new Vector3(basePos.x - 7.3f, basePos.y, basePos.z + 6.5f);
+                westEuler = new Vector3(baseEuler.x, baseEuler.y + 90, baseEuler.z);
+                westQuat = Quaternion.Euler(westEuler);
+                //move borders
+                bordersTrans.position = moveBordersEast;
+                //reset
+                borderTrigger.goingEast = false;
+                timer2 = 0;
+                addedMoveAmount = false;
+            }
+        }
+        //MOVE WEST 
+        if (borderTrigger.goingWest)
+        {
+            timer2 += Time.deltaTime * lerpSpeed;
+            if (!addedMoveAmount)
+            {
+                moveWest = new Vector3(myCamTrans.position.x -10, myCamTrans.position.y, myCamTrans.position.z);
+                moveBordersWest = new Vector3(bordersTrans.position.x - 10, bordersTrans.position.y, bordersTrans.position.z);
+                addedMoveAmount = true;
+            }
+            else if (addedMoveAmount)
+            {
+                //do nothing if we already moved 
+            }
+            //lerp to the new postition
+            myCamTrans.position = Vector3.Lerp(myCamTrans.position, moveWest, timer2);
+            //set base pos to the new base position (not the current position!!! bc we might be facing another dir) 
+            if (myCamTrans.position == moveWest)
+            {
+                Vector3 newBasePos = new Vector3(basePos.x -10, basePos.y, basePos.z);
+                basePos = newBasePos;
+                //RESET DIRECTIONS BASED ON NEW BASE POS
+                //EAST
+                eastPos = new Vector3(basePos.x + 7.36f, basePos.y, basePos.z + 6.5f);
+                eastEuler = new Vector3(baseEuler.x, baseEuler.y - 90, baseEuler.z);
+                eastQuat = Quaternion.Euler(eastEuler);
+                //NORTH
+                northPos = new Vector3(basePos.x, basePos.y, basePos.z + 14.3f);
+                northEuler = new Vector3(baseEuler.x, baseEuler.y + 180, baseEuler.z);
+                northQuat = Quaternion.Euler(northEuler);
+                //WEST
+                westPos = new Vector3(basePos.x - 7.3f, basePos.y, basePos.z + 6.5f);
+                westEuler = new Vector3(baseEuler.x, baseEuler.y + 90, baseEuler.z);
+                westQuat = Quaternion.Euler(westEuler);
+                //move borders
+                bordersTrans.position = moveBordersWest;
+                //reset
+                borderTrigger.goingWest = false;
+                timer2 = 0;
+                addedMoveAmount = false;
+            }
+        }
+        //USING ARROW KEYS TO ROTATE CAMERA 
         if (LerpingLeft || LerpingRight)
         {
             //allow current lerp to finish
